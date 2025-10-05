@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>王three个人网站</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        h1 {
+            margin: 0;
+            color: #2c3e50;
+        }
+        
+        nav {
+            display: flex;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .nav-tabs li {
+            margin-right: 20px;
+        }
+        
+        .nav-tabs a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-tabs a:hover {
+            background-color: rgba(44, 62, 80, 0.1);
+        }
+        
+        .nav-tabs a.active {
+            background-color: #2c3e50;
+            color: white;
+        }
+        
+        .language-switcher {
+            display: flex;
+            align-items: center;
+        }
+        
+        .language-switcher select {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background-color: white;
+        }
+        
+        .page-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            min-height: 400px;
+            transition: opacity 0.3s ease;
+            position: relative;
+        }
+        
+        .resource-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .resource-item.highlight {
+            background-color: #e3f2fd;
+            box-shadow: 0 0 0 2px #2196f3;
+            transform: scale(1.02);
+        }
+        
+        .resource-item a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .resource-item a:hover {
+            text-decoration: underline;
+        }
+        
+        .profile {
+            display: flex;
+            align-items: center;
+        }
+        
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 30px;
+            border: 5px solid #ecf0f1;
+        }
+        
+        .profile-info {
+            flex: 1;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* 网友投稿卡片样式 */
+        .submission-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .submission-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border: 1px solid #e9ecef;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .submission-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .submission-card.highlight {
+            background-color: #e3f2fd;
+            box-shadow: 0 0 0 2px #2196f3;
+            transform: scale(1.02) translateY(-5px);
+        }
+        
+        .submission-card h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        .submission-card p {
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 0;
+        }
+        
+        /* 加载指示器样式 */
+        .loader {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 9999;
+        }
+        
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+            z-index: 9998;
+        }
+        
+        /* 搜索框样式 */
+        .search-container {
+            position: absolute;
+            right: 150px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1001; /* 确保搜索框在最上层 */
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 20px 0 0 20px;
+            width: 0;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input.expanded {
+            width: 200px;
+            opacity: 1;
+        }
+        
+        .search-btn {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 0 20px 20px 0;
+            cursor: pointer;
+        }
+        
+        .search-results {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 300px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1002; /* 提高搜索结果的z-index */
+        }
+        
+        .search-result-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .search-result-item:hover {
+            background-color: #f5f7fa;
+        }
+        
+        .no-results {
+            padding: 10px;
+            color: #777;
+            text-align: center;
+        }
+        
+        /* 回到顶部按钮样式 */
+        .back-to-top {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .back-to-top:hover {
+            background: #3498db;
+            transform: translateY(-5px);
+        }
+        
+        /* 打赏按钮样式 */
+        .donate-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 99;
+        }
+        
+        .donate-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .donate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+        }
+        
+        /* 复制按钮样式 */
+        .copy-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin: 20px 0;
+            font-size: 16px;
+        }
+        
+        .copy-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+            background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+        }
+        
+        .copy-btn.copied {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+        
+        .copy-btn.copied:hover {
+            box-shadow: 0 8px 20px rgba(39, 174, 96, 0.4);
+            background: linear-gradient(135deg, #229954 0%, #27ae60 100%);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .search-container {
+                position: static;
+                transform: none;
+                margin-top: 15px;
+                width: 100%;
+                z-index: 1001;
+            }
+            
+            .search-input.expanded {
+                width: 100%;
+            }
+            
+            .search-results {
+                width: 100%;
+                right: auto;
+                left: 0;
+                z-index: 1002;
+            }
+            
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .language-switcher {
+                margin-top: 15px;
+            }
+
+            .donate-container {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .donate-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            
+            .copy-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+        
+        /* 通知消息样式 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background-color: #27ae60;
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 2000; /* 提高通知的z-index */
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            display: none; /* 默认隐藏 */
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+            display: block; /* 显示时设置为block */
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载指示器 -->
+    <div class="overlay" id="overlay"></div>
+    <div class="loader" id="loader"></div>
+    
+    <!-- 回到顶部按钮 -->
+    <button class="back-to-top" id="backToTop">↑</button>
+    
+    <!-- 通知消息 -->
+    <div class="notification" id="notification">内容已复制到剪贴板！</div>
+    
+    <div class="container">
+        <header>
+            <h1>王three个人网站</h1>
+            <nav>
+                <ul class="nav-tabs">
+                    <li><a href="#" class="active" data-page="home">首页</a></li>
+                    <li><a href="#" data-page="resources">资源</a></li>
+                    <li><a href="#" data-page="about">王three</a></li>
+                    <li><a href="#" data-page="account">网友投稿</a></li>
+                </ul>
+            </nav>
+            
+            <!-- 搜索框 -->
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" class="search-input" id="searchInput" placeholder="搜索内容...">
+                    <button class="search-btn" id="searchBtn">🔍</button>
+                </div>
+                <div class="search-results" id="searchResults"></div>
+            </div>
+            
+            <div class="language-switcher">
+                <select id="language-select">
+                    <option value="zh">中文</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+        </header>
+        
+        <main>
+            <div id="home-page" class="page-content">
+                <h2>欢迎来到王three个人网站</h2>
+                <p>你可以在这里浏览一些关于王three的内容。</p>
+                <p>网站正在不断完善中，感谢您的访问！</p>
+                
+                <!-- 复制按钮 -->
+                <div style="text-align: center; margin: 30px 0;">
+                    <button class="copy-btn" id="copyContentBtn">
+                        📋也给别人看看去
+                    </button>
+                    <p style="color: #666; font-size: 14px; margin-top: 10px;">劝你最好别点，点了也别转，要不作者半夜岂不笑死在床上？</p>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 20px; background-color: #f1f8fe; border-radius: 5px;">
+                    <h3>最新动态</h3>
+                    <h4>注：更新优化将不会放入动态中</h4>
+                    <ul>
+                        <li>2025.9.13:增加网友投稿并大更新</li>
+			            <li>2025.8.29:增加网友投稿</li>
+                        <li>2025.8.25:增加网友投稿并简单优化</li>
+                        <li>2025.8.24:网站打包成app并上线</li>
+                        <li>2025.8.15:网站正式上线</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <!-- 动态时钟组件 -->
+                    <div style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+                        <h3 style="margin-top: 0; font-weight: normal;">当前时间</h3>
+                        <div style="display: flex; align-items: baseline; gap: 10px;">
+                            <div id="clock" style="font-size: 32px; font-family: monospace;"></div>
+                            <div id="date" style="color: #bdc3c7; font-size: 14px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- 随机颜色工具 -->
+                    <div>
+                        <h3>随机颜色生成器（做着玩的）</h3>
+                        <div style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <button id="randomColorBtn" style="padding: 10px 20px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                生成随机颜色
+                            </button>
+            
+                            <div id="colorDisplay" style="width: 150px; height: 150px; margin: 15px 0; background-color: #eee; border-radius: 5px; transition: background-color 0.5s;"></div>
+            
+                            <div id="colorValue" style="padding: 10px; background-color: #f8f9fa; border-radius: 5px; font-family: monospace; color: #333;">
+                                颜色值: rgb(238, 238, 238)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="resources-page" class="page-content hidden">
+                <h2>资源分享</h2>
+                <p>这里是王three的一些资源，点击链接可以下载。</p>
+                
+                <div class="resource-item" data-resource-id="pvz_plus_version_three">
+                    <h3>植物大战僵尸Three版</h3>
+                    <p>王three制作的植物大战僵尸改版</p>
+                    <i>该作品目前正在制作中，还未上线，敬请期待！</i>
+                </div>
+                
+                <div class="resource-item" data-resource-id="iwanna">
+                    <h3>I wanna do something</h3>
+                    <p>由王three制作的iwanna系列游戏</p>
+                    <p>注：无可直接运行的.exe程序，需在I wanna be the creator上运行</p>
+                    <i>该作品目前正在制作中，还未上线，敬请期待！</i>
+                </div>
+                
+                <div class="resource-item" data-resource-id="app">
+                    <h3>王three   APP</h3>
+                    <p>本网站同款的手机可用app（仅安卓）</p>
+                    <a href="45a01d35b78c17fdf65466c5aa53d7f7.apk" download="45a01d35b78c17fdf65466c5aa53d7f7.apk">下载--></a>
+                </div>
+
+                <div class="resource-item" data-resource-id="clicker">
+                    <h3>连点器</h3>
+                    <p>普通的连点器</p>
+                    <a href="连点器.zip" download="连点器.zip">下载--></a>
+                </div>
+                
+                <div class="resource-item" data-resource-id="deepseek">
+                    <h3>DeepSeek R1 by 王three</h3>
+                    <p>王three版deepseek（部分功能尚未完善）</p>
+                    <a href="Deepseek R1 Setup.zip" download="Deepseek R1 Setup.zip">下载--></a>
+                </div>
+                
+                <div class="resource-item" data-resource-id="xtc-v1.5">
+                    <h3>小天才破解工具v1.5</h3>
+                    <p>最新版小天才破解工具</p>
+                    <a href="XTC_Cracker v1.5 Setup.zip" download="XTC_Cracker Setup.zip">下载--></a>
+                </div>
+                
+                <div class="resource-item" data-resource-id="xtc-old">
+                    <h3>小天才破解工具（老版本整合包）</h3>
+                    <p>老版本的小天才破解工具，bug较多，慎用</p>
+                    <a href="XTC_Cracker整合包.zip" download="XTC_Cracker整合包.zip">下载--></a>
+                </div>
+            </div>
+            
+            <div id="about-page" class="page-content hidden">
+                <h2>关于王three</h2>
+                <div class="profile">
+                    <div class="profile-info">
+                        <p>你好，我是王three，是个人。</p>
+                        <p>我真的太<del>衰气</del>帅气了。</p>
+                        <p>想不出别的介绍了，以后有时间再补上。</p>
+                        <p><sub>看右下角！</sub></p>
+                    </div>
+                </div>
+                
+                <!-- 打赏按钮 -->
+                <div class="donate-container">
+                    <a href="reward.html" class="donate-btn">打赏作者</a>
+                </div>
+            </div>
+            
+            <div id="account-page" class="page-content hidden">
+                <h2>网友投稿</h2>
+                
+                <!-- 投稿卡片容器 -->
+            <div class="submission-container">
+                <div class="float">
+                    <a href="subs/good_webs.html" class="submission-card" data-submission-id="good-webs">
+                        <h3>好用网站大全</h3>
+                        <p>收集了一些实用有趣的网站，全都免费。</p>
+                        <li>由 [多位网友] 提供</li>
+                    </a>
+                </div>
+
+                <div class="float">
+                    <a href="subs/OMOFUN.zip" class="submission-card" download="subs/OMOFUN.zip">
+                    <h3>全能的观影网站</h3>
+                        <p>无需登录也可以观看各大动漫电影。</p>
+                        <li>由小天才用户"科技少年"提供</li>
+                    </a>
+                </div>
+
+                <div class="float">
+                    <a href="subs/catpics.html" class="submission-card" data-submission-id="catpics">
+                        <h3>可爱的猫猫图片</h3>
+                        <p>有一些网友自家养的猫的图片。</p>
+                        <li>由小天才用户"小妞宝"提供</li>
+                    </a>
+                </div>
+            </div>
+
+                <div class="empty-state">
+                    <h3>期待更多网友投稿！</h3>
+                    <p>如果你有什么想法或资源想要分享，欢迎联系王three！</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 页面切换功能
+        document.querySelectorAll('.nav-tabs a').forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 移除所有标签的active类
+                document.querySelectorAll('.nav-tabs a').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // 给当前点击的标签添加active类
+                this.classList.add('active');
+                
+                // 隐藏所有页面
+                document.querySelectorAll('.page-content').forEach(page => {
+                    page.classList.add('hidden');
+                });
+                
+                // 显示对应的页面
+                const pageId = this.getAttribute('data-page') + '-page';
+                document.getElementById(pageId).classList.remove('hidden');
+                
+                // 滚动到页面顶部
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+        
+        // 语言切换功能
+        document.getElementById('language-select').addEventListener('change', function() {
+            if(this.value === 'en') {
+                alert('The English version is under development. Currently only Chinese is available.');
+                this.value = 'zh';
+            }
+        });
+        
+        // 加载指示器功能
+        function showLoader() {
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+        
+        function hideLoader() {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+        
+        // 搜索功能
+        const searchBtn = document.getElementById('searchBtn');
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        
+        // 切换搜索框展开状态
+        searchBtn.addEventListener('click', function() {
+            searchInput.classList.toggle('expanded');
+            if (searchInput.classList.contains('expanded')) {
+                searchInput.focus();
+            } else {
+                searchResults.style.display = 'none';
+            }
+        });
+        
+        // 搜索功能
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim().toLowerCase();
+            
+            if (query.length === 0) {
+                searchResults.style.display = 'none';
+                return;
+            }
+            
+            let resultsHtml = '';
+            let resultCount = 0;
+            
+            // 搜索资源项
+            const resources = document.querySelectorAll('.resource-item');
+            resources.forEach(resource => {
+                const title = resource.querySelector('h3').textContent.toLowerCase();
+                const description = resource.querySelector('p').textContent.toLowerCase();
+                const resourceId = resource.getAttribute('data-resource-id');
+                
+                if (title.includes(query) || description.includes(query)) {
+                    resultCount++;
+                    resultsHtml += `
+                        <div class="search-result-item" data-target="resources" data-item-id="${resourceId}" data-type="resource">
+                            <strong>资源: ${resource.querySelector('h3').textContent}</strong>
+                            <p>${resource.querySelector('p').textContent}</p>
+                        </div>
+                    `;
+                }
+            });
+            
+            // 搜索网友投稿
+            const submissions = document.querySelectorAll('.submission-card');
+            submissions.forEach(submission => {
+                const title = submission.querySelector('h3').textContent.toLowerCase();
+                const description = submission.querySelector('p').textContent.toLowerCase();
+                const submissionId = submission.getAttribute('data-submission-id');
+                
+                if (title.includes(query) || description.includes(query)) {
+                    resultCount++;
+                    resultsHtml += `
+                        <div class="search-result-item" data-target="account" data-item-id="${submissionId}" data-type="submission">
+                            <strong>投稿: ${submission.querySelector('h3').textContent}</strong>
+                            <p>${submission.querySelector('p').textContent}</p>
+                        </div>
+                    `;
+                }
+            });
+            
+            // 搜索首页内容
+            const homeItems = document.querySelectorAll('#home-page h2, #home-page h3, #home-page p, #home-page li');
+            homeItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(query) && text.length > 10) { 
+                    resultCount++;
+                    resultsHtml += `
+                        <div class="search-result-item" data-target="home" data-type="home">
+                            <strong>首页: ${item.textContent.substring(0, 50)}${item.textContent.length > 50 ? '...' : ''}</strong>
+                        </div>
+                    `;
+                }
+            });
+            
+            // 搜索关于页面内容
+            const aboutItems = document.querySelectorAll('#about-page h2, #about-page p');
+            aboutItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(query) && text.length > 10) {
+                    resultCount++;
+                    resultsHtml += `
+                        <div class="search-result-item" data-target="about" data-type="about">
+                            <strong>关于: ${item.textContent.substring(0, 50)}${item.textContent.length > 50 ? '...' : ''}</strong>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (resultCount > 0) {
+                searchResults.innerHTML = resultsHtml;
+                searchResults.style.display = 'block';
+                
+                // 添加搜索结果点击事件
+                document.querySelectorAll('.search-result-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const targetPage = this.getAttribute('data-target');
+                        const itemId = this.getAttribute('data-item-id');
+                        const itemType = this.getAttribute('data-type');
+                        
+                        // 切换到对应页面
+                        document.querySelectorAll('.nav-tabs a').forEach(tab => {
+                            tab.classList.remove('active');
+                            if (tab.getAttribute('data-page') === targetPage) {
+                                tab.classList.add('active');
+                            }
+                        });
+                        
+                        document.querySelectorAll('.page-content').forEach(page => {
+                            page.classList.add('hidden');
+                        });
+                        
+                        document.getElementById(targetPage + '-page').classList.remove('hidden');
+                        
+                        // 隐藏搜索框和结果
+                        searchInput.classList.remove('expanded');
+                        searchResults.style.display = 'none';
+                        searchInput.value = '';
+                        
+                        // 滚动到对应项目
+                        setTimeout(() => {
+                            if (itemType === 'resource') {
+                                const targetResource = document.querySelector(`[data-resource-id="${itemId}"]`);
+                                if (targetResource) {
+                                    // 移除之前的高亮
+                                    document.querySelectorAll('.resource-item.highlight').forEach(item => {
+                                        item.classList.remove('highlight');
+                                    });
+                                    
+                                    // 添加高亮效果
+                                    targetResource.classList.add('highlight');
+                                    
+                                    // 滚动到目标元素
+                                    targetResource.scrollIntoView({ 
+                                        behavior: 'smooth', 
+                                        block: 'center'
+                                    });
+                                    
+                                    // 3秒后移除高亮
+                                    setTimeout(() => {
+                                        targetResource.classList.remove('highlight');
+                                    }, 3000);
+                                }
+                            } else if (itemType === 'submission') {
+                                const targetSubmission = document.querySelector(`[data-submission-id="${itemId}"]`);
+                                if (targetSubmission) {
+                                    // 移除之前的高亮
+                                    document.querySelectorAll('.submission-card.highlight').forEach(item => {
+                                        item.classList.remove('highlight');
+                                    });
+                                    
+                                    // 添加高亮效果
+                                    targetSubmission.classList.add('highlight');
+                                    
+                                    // 滚动到目标元素
+                                    targetSubmission.scrollIntoView({ 
+                                        behavior: 'smooth', 
+                                        block: 'center'
+                                    });
+                                    
+                                    // 3秒后移除高亮
+                                    setTimeout(() => {
+                                        targetSubmission.classList.remove('highlight');
+                                    }, 3000);
+                                }
+                            } else {
+                                // 对于首页和关于页面，滚动到顶部
+                                window.scrollTo({
+                                    top: 0,
+                                    behavior: 'smooth'
+                                });
+                            }
+                        }, 100);
+                    });
+                });
+            } else {
+                searchResults.innerHTML = '<div class="no-results">未找到相关内容</div>';
+                searchResults.style.display = 'block';
+            }
+        });
+        
+        // 点击页面其他区域关闭搜索结果
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-container')) {
+                searchResults.style.display = 'none';
+                searchInput.classList.remove('expanded');
+            }
+        });
+        
+        // 回到顶部功能
+        const backToTopBtn = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.style.display = 'block';
+            } else {
+                backToTopBtn.style.display = 'none';
+            }
+        });
+        
+        backToTopBtn.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+        
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            const weekday = weekdays[now.getDay()];
+        
+            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+            document.getElementById('date').textContent = `${year}.${month}.${day} ${weekday}`;
+        }
+        // 初始化时钟并每秒更新
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // 随机颜色功能
+        document.getElementById('randomColorBtn').addEventListener('click', function() {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            const color = `rgb(${r}, ${g}, ${b})`;
+        
+            document.getElementById('colorDisplay').style.backgroundColor = color;
+            document.getElementById('colorValue').textContent = `颜色值: ${color}`;
+        });
+        
+        // 复制内容功能
+        document.getElementById('copyContentBtn').addEventListener('click', function() {
+            const publicContent = `---通知---
+这位用户邀请您来参观王three的网站啦！
+里面有许多关于王three的内容。
+欢迎您来访问！😊
+网址：https://wang-three.vercel.app
+（网站已在Vercel上稳定部署）
+————内容来自网站复制`;
+
+            // 使用Clipboard API复制文本
+            navigator.clipboard.writeText(publicContent).then(() => {
+                // 显示通知
+                const notification = document.getElementById('notification');
+                notification.classList.add('show');
+                
+                // 改变按钮样式
+                const btn = document.getElementById('copyContentBtn');
+                btn.classList.add('copied');
+                btn.textContent = '✓ 已复制';
+                
+                // 3秒后恢复按钮样式
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.textContent = '📋也给别人看看去';
+                    notification.classList.remove('show');
+                }, 3000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+                alert('复制失败！不！！！');
+            });
+        });
+    </script>
+</body>
+</html>
